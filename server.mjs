@@ -3,7 +3,7 @@ import dotenv from "dotenv";
 import bodyParser from "body-parser";
 import mongoose from "mongoose";
 import connectToDatabase from "./config/db.mjs";
-// import router from "./routes/route.mjs";
+import router from "./routes/route.mjs";
 import { Schema } from "mongoose";
 
 
@@ -30,7 +30,7 @@ app.get("/", (req, res) => {
 });
 
 
-// app.use("/", router);
+app.use("/api", router);
 
 
 app.listen(PORT, () => {
