@@ -72,6 +72,7 @@ router.post('/blob/', upload.single('file'), async (req, res) => {
       const newBlob = new Blob({
         data: req.file.buffer,
         contentType: req.file.mimetype,
+        pictureName: req.file.originalname,
       });
   
       // Save the Blob to MongoDB
@@ -115,6 +116,64 @@ router.get('/blobs', async (req, res) => {
     }
   });
 
+// Get all blob IDs
+router.get('/blobslist', async (req, res) => {
+    try {
+      const result = await Blob.aggregate([
+        {
+          '$group': {
+            '_id': null,
+            'ids': {
+              '$push': '$_id'
+            }
+          }
+        },
+        {
+          '$project': {
+            '_id': 0,
+            'ids': 1
+          }
+        }
+      ]);
+  
+      res.json(result[0]?.ids || []);
+    } catch (error) {
+      console.error('Error fetching blobs:', error);
+      res.status(500).json({ error: 'Internal server error.' });
+    }
+  });
+  
 
+//Edit blob by ID
+router.put('/blob/:id', async (req, res) => {
+    try {
+      const blob = await Blob.findByIdAndUpdate(req.params.id, req.body , { new: true });
+    
+        if (!blob) {
+          return res.status(404).json({ error: 'Blob not found.' });
+        }
+        res.json(blob); 
+    } catch (error) {
+        console.error('Error updating blob:', error);
+        res.status(500).json({ error: 'Internal server error.' });
+        }
+    });
+
+
+// DELETE route to delete blob by ID
+router.delete('/blob/:id', async (req, res) => {
+    try {
+      const blob = await Blob.findByIdAndDelete(req.params.id);
+  
+      if (!blob) {
+        return res.status(404).json({ error: 'Blob not found.' });
+      }
+  
+      res.json({ message: 'Blob deleted successfully.' });
+    } catch (error) {
+      console.error('Error deleting blob:', error);
+      res.status(500).json({ error: 'Internal server error.' });
+    }
+  });
 
   export default router;
