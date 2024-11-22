@@ -3,8 +3,9 @@ import dotenv from "dotenv";
 import bodyParser from "body-parser";
 import mongoose from "mongoose";
 import connectToDatabase from "./config/db.mjs";
-import router from "./routes/route.mjs";
+import router from "./routes/pageroute.mjs";
 import { Schema } from "mongoose";
+import book_router from "./routes/book_routes.mjs";
 
 
 import cors from "cors";
@@ -31,6 +32,8 @@ app.get("/", (req, res) => {
 
 
 app.use("/api", router);
+
+app.use("/books", book_router);
 
 
 app.listen(PORT, () => {

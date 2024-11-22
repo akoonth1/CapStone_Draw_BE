@@ -132,6 +132,7 @@ router.get('/blobslist', async (req, res) => {
           '$project': {
             '_id': 0,
             'ids': 1
+            
           }
         }
       ]);
@@ -142,23 +143,61 @@ router.get('/blobslist', async (req, res) => {
       res.status(500).json({ error: 'Internal server error.' });
     }
   });
+
+
+// GET route to retrieve pictureName by ID
+router.get('/blob/:id/pictureName', async (req, res) => {
+    const { id } = req.params;
+  
+    try {
+      const blob = await Blob.findById(id, 'pictureName');
+  
+      if (!blob) {
+        return res.status(404).json({ message: 'Blob not found.' });
+      }
+  
+      res.status(200).json({ pictureName: blob.pictureName });
+    } catch (error) {
+      console.error('Error retrieving pictureName:', error);
+      res.status(500).json({ message: 'Internal server error.' });
+    }
+  });
+
+
+
+  
   
 
 //Edit blob by ID
-router.put('/blob/:id', async (req, res) => {
+router.put('/blob/:id', upload.single('data'), async (req, res) => {
+    const { id } = req.params;
+    const { pictureName, contentType } = req.body;
+    const file = req.file;
+  
+    if (!file || !pictureName || !contentType) {
+      return res.status(400).json({ message: 'data, pictureName, and contentType are required.' });
+    }
+  
     try {
-      const blob = await Blob.findByIdAndUpdate(req.params.id, req.body , { new: true });
-    
-        if (!blob) {
-          return res.status(404).json({ error: 'Blob not found.' });
+      const updatedBlob = await Blob.findByIdAndUpdate(
+        id,
+        {
+          data: file.buffer,
+          contentType,
+          pictureName,
         }
-        res.json(blob); 
+      );
+  
+      if (!updatedBlob) {
+        return res.status(404).json({ message: 'Image not found.' });
+      }
+  
+      res.status(200).json({ message: 'Image updated successfully.' });
     } catch (error) {
-        console.error('Error updating blob:', error);
-        res.status(500).json({ error: 'Internal server error.' });
-        }
-    });
-
+      console.error('Error updating image:', error);
+      res.status(500).json({ message: 'Internal server error.' });
+    }
+  });
 
 // DELETE route to delete blob by ID
 router.delete('/blob/:id', async (req, res) => {
