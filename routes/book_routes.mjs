@@ -61,7 +61,9 @@ book_router.get('/booklist/:id', async (req, res) => {
             },
             {
                 '$project': {
-                    'PagesArray': 1
+                    'PagesArray': 1,
+                    'TextArray': 1
+
                 }
             }
         ]);
@@ -69,8 +71,10 @@ book_router.get('/booklist/:id', async (req, res) => {
         if (bookslist.length === 0) {
             return res.status(404).send('Book not found');
         }
+        //console.log(bookslist);
+        res.json(bookslist//[0].PagesArray
 
-        res.json(bookslist[0].PagesArray);
+        );
     } catch (error) {
         res.status(500).send('Error retrieving pages: ' + error.message);
     }
