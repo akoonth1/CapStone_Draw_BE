@@ -3,6 +3,12 @@ import express from 'express';
 import mongoose from 'mongoose';
 import connectToDatabase from '../config/db.mjs';
 import User from '../models/UsersSchema.mjs';
+import { Schema } from 'mongoose';
+import { check, validationResult } from 'express-validator';
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
+import auth from '../middleware/auth.mjs';
+
 
 
 
@@ -12,17 +18,87 @@ dotenv.config();
 const user_router = express.Router();
 
 // Connect to the database
-connectToDatabase();
+// connectToDatabase();
 
 //Create a user
-user_router.post('/user', async (req, res) => {
-    try {
+// user_router.post('/user', async (req, res) => {
+//     try {
+//         const { name, email, password } = req.body;
+//         const user =  new User({ name, email, password });
+//         await user.save();
+//         res.status(201).json({ message: 'User uploaded successsfully.' })
+//     } catch (error) {
+//         res.status(500).json({ message: 'Internal server error.' })
+//     }
+// });
+
+user_router.post('/user', 
+[   check('name', 'Name is required').not().isEmpty(),
+    check('email', 'Please include a valid email').isEmail(),
+    check('password', 'Please enter a password with 6 or more characters').isLength({ min: 6 }),
+]
+    , async (req, res) => {
+
+        const errors = validationResult(req);
+
+        if (!errors.isEmpty()) {
+            return res.status(400).json({ errors: errors.array() });
+        }
         const { name, email, password } = req.body;
-        const user = new User({ name, email, password });
-        await user.save();
-        res.status(201).json({ message: 'User uploaded successsfully.' })
+
+        try {
+
+            let user = await User.findOne({ email });
+
+            if (user) {
+                return res.status(400).json({ message: 'User already exists.' });
+            }
+
+            user = new User({
+                name,
+                email,
+                password
+            });
+
+            const salt = await bcrypt.genSalt(10);
+
+            user.password = await bcrypt.hash(password, salt);
+
+            await user.save();
+
+            const payload = {
+                user: {
+                    id: user.id
+                }
+            }
+            // console.log('Payload:', payload);
+
+            jwt.sign(payload, process.env.jwtPrivateKey ,
+                { expiresIn: 36000 }, 
+                (error, token) => {
+                    if (error) throw error;
+                    // console.log('Token:', token);
+                    res.json({ token });
+                }
+            );
+
+        } catch (error) {
+            res.status(500).json({ message: 'Internal server error.' });
+        }
+    }
+);
+
+
+
+
+//Get all user information
+user_router.get('/user/:id', (req, res) => {
+    try {
+        const { id } = req.params;
+        const user = User.findById(id);
+        res.json(user);
     } catch (error) {
-        res.status(500).json({ message: 'Internal server error.' })
+        res.status(500).send('Error retrieving user: ' + error.message);
     }
 });
 

@@ -12,7 +12,7 @@ dotenv.config();
 const book_router = express.Router();
 
 // Connect to the database
-connectToDatabase();
+// connectToDatabase();
 
 book_router.get('/test', (req, res) => {
     res.send('Hello World!');

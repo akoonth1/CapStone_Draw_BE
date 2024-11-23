@@ -9,39 +9,10 @@ import multer from 'multer';
 
 dotenv.config();
 
-const router = express.Router();
+const page_router = express.Router();
 
 // Connect to the database
-connectToDatabase();
-
-
-// // Route to write blob object to the database
-// router.post('/blob', async (req, res) => {
-//   try {
-//     const { data, contentType } = req.body;
-//     const blob = new BlobModel({ data: Buffer.from(data, 'base64'), contentType });
-//     await blob.save();
-//     res.status(201).send('Blob saved successfully');
-//   } catch (error) {
-//     res.status(500).send('Error saving blob: ' + error.message);
-//   }
-// });
-
-// Route to read blob object from the database
-// router.get('/blob/:id', async (req, res) => {
-//   try {
-//     const blob = await BlobModel.findById(req.params.id);
-//     if (!blob) {
-//       return res.status(404).send('Blob not found');
-//     }
-//     res.set('Content-Type', blob.contentType);
-//     res.send(blob.data);
-//   } catch (error) {
-//     res.status(500).send('Error retrieving blob: ' + error.message);
-//   }
-// });
-
-// export default router;
+// connectToDatabase();
 
 
 // Configure multer for file uploads (memory storage)
@@ -54,7 +25,7 @@ const upload = multer({
 
 
 // POST route to handle blob upload
-router.post('/blob/', upload.single('file'), async (req, res) => {
+page_router.post('/blob/', upload.single('file'), async (req, res) => {
     try {
       if (!req.file) {
         return res.status(400).json({ error: 'No file uploaded.' });
@@ -87,7 +58,7 @@ router.post('/blob/', upload.single('file'), async (req, res) => {
   
 
   // GET route to retrieve blob by ID
-router.get('/blob/:id', async (req, res) => {
+  page_router.get('/blob/:id', async (req, res) => {
     try {
       const blob = await Blob.findById(req.params.id);
   
@@ -106,7 +77,7 @@ router.get('/blob/:id', async (req, res) => {
 
 
 //Get all blob IDs
-router.get('/blobs', async (req, res) => {
+page_router.get('/blobs', async (req, res) => {
     try {
       const blobs = await Blob.find({}, '_id');
       res.json(blobs);
@@ -117,7 +88,7 @@ router.get('/blobs', async (req, res) => {
   });
 
 // Get all blob IDs
-router.get('/blobslist', async (req, res) => {
+page_router.get('/blobslist', async (req, res) => {
     try {
       const result = await Blob.aggregate([
         {
@@ -146,7 +117,7 @@ router.get('/blobslist', async (req, res) => {
 
 
 // GET route to retrieve pictureName by ID
-router.get('/blob/:id/pictureName', async (req, res) => {
+page_router.get('/blob/:id/pictureName', async (req, res) => {
     const { id } = req.params;
   
     try {
@@ -169,7 +140,7 @@ router.get('/blob/:id/pictureName', async (req, res) => {
   
 
 //Edit blob by ID
-router.put('/blob/:id', upload.single('data'), async (req, res) => {
+page_router.put('/blob/:id', upload.single('data'), async (req, res) => {
     const { id } = req.params;
     const { pictureName, contentType } = req.body;
     const file = req.file;
@@ -200,7 +171,7 @@ router.put('/blob/:id', upload.single('data'), async (req, res) => {
   });
 
 // DELETE route to delete blob by ID
-router.delete('/blob/:id', async (req, res) => {
+page_router.delete('/blob/:id', async (req, res) => {
     try {
       const blob = await Blob.findByIdAndDelete(req.params.id);
   
@@ -215,4 +186,4 @@ router.delete('/blob/:id', async (req, res) => {
     }
   });
 
-  export default router;
+  export default page_router;
