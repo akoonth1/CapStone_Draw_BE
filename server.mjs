@@ -9,6 +9,7 @@ import book_router from "./routes/book_routes.mjs";
 import user_router from "./routes/user_routes.mjs";
 import { errorHandler } from "./middleware/errors_are_mid.mjs";
 import router from "./routes/auth_route.mjs";
+import color_router from "./routes/color_route.mjs";
 
 import cors from "cors";
 import morgan from "morgan"; // middleware for logging requests
@@ -40,6 +41,8 @@ app.use("/books", book_router);
 app.use("/users", user_router);
 
 app.use("/api/auth", router);
+
+app.use("/color", color_router);
 
 
 app.use((req, res, next) => {
