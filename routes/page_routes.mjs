@@ -31,7 +31,9 @@ page_router.post('/blob/', upload.single('file'), async (req, res) => {
         return res.status(400).json({ error: 'No file uploaded.' });
       }
 
-      console.log('Received file:', req.file);
+      // console.log('Received file:', req.file);
+      // console.log('Received file ID :', req.body.userId);
+      // console.log(req)
 
       // Verify that req.file.buffer is a Buffer
       if (!Buffer.isBuffer(req.file.buffer)) {
@@ -44,8 +46,9 @@ page_router.post('/blob/', upload.single('file'), async (req, res) => {
         data: req.file.buffer,
         contentType: req.file.mimetype,
         pictureName: req.file.originalname,
+        createdBy: req.body.userId,
       });
-  
+
       // Save the Blob to MongoDB
       await newBlob.save();
   
@@ -145,10 +148,11 @@ page_router.put('/blob/:id', upload.single('data'), async (req, res) => {
     const { pictureName, contentType } = req.body;
     const file = req.file;
   
+  
     if (!file || !pictureName || !contentType) {
       return res.status(400).json({ message: 'data, pictureName, and contentType are required.' });
     }
-  
+
     try {
       const updatedBlob = await Blob.findByIdAndUpdate(
         id,
@@ -156,6 +160,7 @@ page_router.put('/blob/:id', upload.single('data'), async (req, res) => {
           data: file.buffer,
           contentType,
           pictureName,
+          // createdBy: file.userId,
         }
       );
   
@@ -170,6 +175,7 @@ page_router.put('/blob/:id', upload.single('data'), async (req, res) => {
     }
   });
 
+  
 // DELETE route to delete blob by ID
 page_router.delete('/blob/:id', async (req, res) => {
     try {

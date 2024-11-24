@@ -5,7 +5,9 @@ const blobSchema = new mongoose.Schema({
     data: { type: Buffer, required: true },
     contentType: { type: String, required: true },
     pictureName: { type: String, required: true },
+    createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: false },
     createdAt: { type: Date, default: Date.now },
+   
     // categories: { type: String, required: false },
 
   });

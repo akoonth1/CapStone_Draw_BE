@@ -7,8 +7,11 @@ const bookSchema = new mongoose.Schema({
     PagesArray: { type: Array, required: true },
     TextArray: { type: Array, required: false },
     PositionArray: { type: Array, required: false },
+    createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: false },
 });
 
+// Unique index on title
+bookSchema.index({ title: 1 }, { unique: true });
 
 const Book = mongoose.model("Book", bookSchema);
 

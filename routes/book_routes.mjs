@@ -22,9 +22,10 @@ book_router.get('/test', (req, res) => {
 
 book_router.post('/book', async (req, res) => {
     try {
-        const { title, BookID, PagesArray, TextArray, PositionArray } = req.body;
-        const book = new Book({ title, BookID, PagesArray, TextArray, PositionArray });
-        await book.save();
+        const { title, BookID, PagesArray, TextArray, PositionArray, createdBy } = req.body;
+        const book = new Book({ title, BookID, PagesArray, TextArray, PositionArray, createdBy });
+        
+    await book.save();
         res.status(201).json({ message: 'Book uploaded successsfully.' })
     } catch (error) {
         res.status(500).json({ message: 'Internal server error.' })
@@ -115,10 +116,21 @@ book_router.get('/booklistcovers', async (req, res) => {
 });
 
 
+// GET route to retrieve a book by ID
+book_router.get('/book/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const book = await Book.findById(id);
 
+        if (!book) {
+            return res.status(404).send('Book not found');
+        }
 
-
-
+        res.json(book);
+    } catch (error) {
+        res.status(500).send('Error retrieving book: ' + error.message);
+    }
+});
 
 
 
