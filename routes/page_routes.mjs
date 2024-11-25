@@ -192,4 +192,48 @@ page_router.delete('/blob/:id', async (req, res) => {
     }
   });
 
+
+
+
+
+
+
+
+
+
+  // Get all blob IDs
+page_router.get('/blobslist/:uid', async (req, res) => {
+  try {
+    const { uid } = req.params;
+
+    // Validate the ID format
+    if (!mongoose.Types.ObjectId.isValid(uid)) {
+        return res.status(400).json({ message: 'Invalid user ID format.' });
+    }
+
+    const result = await Blob.aggregate(
+      [
+        {
+          '$match': {
+            'createdBy':  new mongoose.Types.ObjectId(uid)
+          }
+        }, {
+          '$group': {
+            '_id': '$createdBy', 
+            'ids': {
+              '$push': '$_id'
+            }
+          }
+        }
+      ]
+  );
+
+    res.json(result[0]?.ids || []);
+  } catch (error) {
+    console.error('Error fetching blobs:', error);
+    res.status(500).json({ error: 'Internal server error.' });
+  }
+});
+
+
   export default page_router;

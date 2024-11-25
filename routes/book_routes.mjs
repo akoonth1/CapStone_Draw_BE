@@ -83,6 +83,47 @@ book_router.get('/booklist/:id', async (req, res) => {
 
 
 
+//Books by ID Route
+
+book_router.get('/book/by/:id', /* auth, */ async (req, res) => { // Uncomment 'auth' if needed
+    try {
+        const { id } = req.params;
+
+        // Validate the ID format
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({ message: 'Invalid user ID format.' });
+        }
+
+        // Option 1: Using Aggregation Pipeline (If you need to perform complex operations)
+        const bookslist = await Book.aggregate([
+            {
+                '$match': {
+                    'createdBy': new mongoose.Types.ObjectId(id) // Correctly using mongoose.Types.ObjectId
+                }
+            },
+            {
+                '$group': {
+                    '_id': '$createdBy',
+                    'books': { '$push': '$$ROOT' } // Aggregating all books under the user
+                }
+            }
+        ]);
+
+        if (bookslist.length === 0) {
+            return res.status(404).json({ message: 'No books found for the given user.' });
+        }
+
+        // Optionally, if you want to return the list of books:
+        res.status(200).json({ books: bookslist[0].books });
+
+    
+    } catch (error) {
+        console.error('Error retrieving books:', error.message);
+        res.status(500).json({ message: 'Error retrieving books.', error: error.message });
+    }
+});
+
+
 
 
 //Booklist Route
