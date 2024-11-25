@@ -172,6 +172,47 @@ book_router.put('/booklist/:id', async (req, res) => {
 
 
 
+book_router.put('/book/:id/textarray', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { TextArray } = req.body;
+        const updatedBook = await Book
+            .findByIdAndUpdate(id, { TextArray });
+
+        if (!updatedBook) {
+            return res.status(404).send('Book not found');
+        }
+
+        res.status(200).send('Book updated successfully');
+    } catch (error) {
+
+        res.status(500).send('Error updating book: ' + error.message);
+    }   
+}   
+
+);
+
+book_router.put('/book/:id/title', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { title } = req.body;
+        const updatedBook = await Book
+            .findByIdAndUpdate(id, { title });
+
+        if (!updatedBook) {
+            return res.status(404).send('Book not found');
+        }
+
+        res.status(200).send('Book updated successfully');
+    } catch (error) {
+
+        res.status(500).send('Error updating book: ' + error.message);
+    }   
+}   
+
+);
+
+
 
 
 

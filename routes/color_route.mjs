@@ -19,11 +19,11 @@ color_router.get('/color', async (req, res) => {
     const data = {
         model: "default",
         input: [
-            // [44, 43, 44],
-            // [90, 83, 82],
-            // "N",
-            // "N",
-            // "N"
+            [44, 43, 44],
+            [90, 83, 82],
+            "N",
+            "N",
+            "N"
         ]
     };
 

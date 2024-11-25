@@ -92,13 +92,39 @@ user_router.post('/user',
 
 
 //Get all user information
-user_router.get('/user/:id', (req, res) => {
+// user_router.get('/user/:id', (req, res) => {
+//     try {
+//         const { id } = req.params;
+//         const user = User.findById(id);
+//         res.json(user);
+//     } catch (error) {
+//         res.status(500).send('Error retrieving user: ' + error.message);
+//     }
+// });
+
+
+
+user_router.get('/user/:id', async (req, res) => {
     try {
         const { id } = req.params;
-        const user = User.findById(id);
+
+        // // Validate the ID format (optional but recommended)
+        // if (!id.match(/^[0-9a-fA-F]{24}$/)) {
+        //     return res.status(400).json({ message: 'Invalid user ID format.' });
+        // }
+
+        // Find the user by ID
+        const user = await User.findById(id).select('-password'); // Exclude password
+
+        if (!user) {
+            return res.status(404).json({ message: 'User not found.' });
+        }
+
+        // Send the user data as JSON
         res.json(user);
     } catch (error) {
-        res.status(500).send('Error retrieving user: ' + error.message);
+        console.error('Error retrieving user:', error.message);
+        res.status(500).json({ message: 'Internal server error.', error: error.message });
     }
 });
 
