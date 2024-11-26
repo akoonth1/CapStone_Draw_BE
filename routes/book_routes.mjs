@@ -20,6 +20,7 @@ book_router.get('/test', (req, res) => {
 
 );
 
+// Create a book
 book_router.post('/book', async (req, res) => {
     try {
         const { title, BookID, PagesArray, TextArray, PositionArray, createdBy } = req.body;
@@ -31,6 +32,61 @@ book_router.post('/book', async (req, res) => {
         res.status(500).json({ message: 'Internal server error.' })
     }
 });
+
+
+// GET route to retrieve a book by ID
+book_router.get('/book/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const book = await Book.findById(id);
+
+        if (!book) {
+            return res.status(404).send('Book not found');
+        }
+
+        res.json(book);
+    } catch (error) {
+        res.status(500).send('Error retrieving book: ' + error.message);
+    }
+});
+
+
+
+// DELETE route to delete a book by ID
+book_router.delete('/booklist/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const deletedBook = await Book.findByIdAndDelete(id);
+
+        if (!deletedBook) {
+            return res.status(404).send('Book not found');
+        }
+
+        res.status(200).send('Book deleted successfully');
+    } catch (error) {
+        res.status(500).send('Error deleting book: ' + error.message);
+    }
+});
+
+
+// PUT route to update a book by ID
+book_router.put('/booklist/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { title, BookID, PagesArray, TextArray, PositionArray } = req.body;
+        const updatedBook = await Book
+            .findByIdAndUpdate(id, { title, BookID, PagesArray, TextArray, PositionArray });
+
+        if (!updatedBook) { 
+            return res.status(404).send('Book not found');
+        }
+
+        res.status(200).send('Book updated successfully');  
+    } catch (error) {    
+        res.status(500).send('Error updating book: ' + error.message);
+    }
+}
+);
 
 
 book_router.get('/booklist', async (req, res) => {
@@ -74,8 +130,8 @@ book_router.get('/booklist/:id', async (req, res) => {
         }
         //console.log(bookslist);
         res.json(bookslist//[0].PagesArray
-
         );
+        
     } catch (error) {
         res.status(500).send('Error retrieving pages: ' + error.message);
     }
@@ -83,28 +139,27 @@ book_router.get('/booklist/:id', async (req, res) => {
 
 
 
-//Books by ID Route
 
+// User's books
 book_router.get('/book/by/:id', /* auth, */ async (req, res) => { // Uncomment 'auth' if needed
     try {
         const { id } = req.params;
 
-        // Validate the ID format
+    
         if (!mongoose.Types.ObjectId.isValid(id)) {
             return res.status(400).json({ message: 'Invalid user ID format.' });
         }
 
-        // Option 1: Using Aggregation Pipeline (If you need to perform complex operations)
         const bookslist = await Book.aggregate([
             {
                 '$match': {
-                    'createdBy': new mongoose.Types.ObjectId(id) // Correctly using mongoose.Types.ObjectId
+                    'createdBy': new mongoose.Types.ObjectId(id) 
                 }
             },
             {
                 '$group': {
                     '_id': '$createdBy',
-                    'books': { '$push': '$$ROOT' } // Aggregating all books under the user
+                    'books': { '$push': '$$ROOT' } 
                 }
             }
         ]);
@@ -113,7 +168,7 @@ book_router.get('/book/by/:id', /* auth, */ async (req, res) => { // Uncomment '
             return res.status(404).json({ message: 'No books found for the given user.' });
         }
 
-        // Optionally, if you want to return the list of books:
+     
         res.status(200).json({ books: bookslist[0].books });
 
     
@@ -156,60 +211,6 @@ book_router.get('/booklistcovers', async (req, res) => {
     }
 });
 
-
-// GET route to retrieve a book by ID
-book_router.get('/book/:id', async (req, res) => {
-    try {
-        const { id } = req.params;
-        const book = await Book.findById(id);
-
-        if (!book) {
-            return res.status(404).send('Book not found');
-        }
-
-        res.json(book);
-    } catch (error) {
-        res.status(500).send('Error retrieving book: ' + error.message);
-    }
-});
-
-
-
-// DELETE route to delete a book by ID
-book_router.delete('/booklist/:id', async (req, res) => {
-    try {
-        const { id } = req.params;
-        const deletedBook = await Book.findByIdAndDelete(id);
-
-        if (!deletedBook) {
-            return res.status(404).send('Book not found');
-        }
-
-        res.status(200).send('Book deleted successfully');
-    } catch (error) {
-        res.status(500).send('Error deleting book: ' + error.message);
-    }
-});
-
-
-
-book_router.put('/booklist/:id', async (req, res) => {
-    try {
-        const { id } = req.params;
-        const { title, BookID, PagesArray, TextArray, PositionArray } = req.body;
-        const updatedBook = await Book
-            .findByIdAndUpdate(id, { title, BookID, PagesArray, TextArray, PositionArray });
-
-        if (!updatedBook) { 
-            return res.status(404).send('Book not found');
-        }
-
-        res.status(200).send('Book updated successfully');  
-    } catch (error) {    
-        res.status(500).send('Error updating book: ' + error.message);
-    }
-}
-);
 
 
 
