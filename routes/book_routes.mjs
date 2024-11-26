@@ -259,41 +259,46 @@ book_router.put('/book/:id/title', async (req, res) => {
 
 
 // User's books
-book_router.get('/book/PageChecker/:id', /* auth, */ async (req, res) => { // Uncomment 'auth' if needed
+book_router.get('/book/PageChecker/:Pid', async (req, res) => { 
     try {
-        const { id } = req.params;
+        const { Pid } = req.params;
 
-    
-        if (!mongoose.Types.ObjectId.isValid(id)) {
-            return res.status(400).json({ message: 'Invalid user ID format.' });
+        // Validate the page ID format
+        if (!mongoose.Types.ObjectId.isValid(Pid)) {
+            return res.status(400).json({ message: 'Invalid page ID format.' });
         }
 
-        const bookslist = await Book.aggregate(
-        [
+        const pageId = Pid.toString();
+
+        // Aggregation pipeline to check if Books contain the page ID
+        const bookslist = await Book.aggregate([
             {
-              '$match': {
-                'PagesArray': new mongoose.Types.ObjectId(id) 
-              }
+                '$project': {
+                    '_id': 1,
+                    'title': 1,
+                    'containsPage': {
+                        '$in': [pageId, '$PagesArray']
+                    }
+                }
+            },
+            {
+                '$match': {
+                    'containsPage': true
+                }
             }
-          ]
-        )
-        ;
+        ]);
 
         if (bookslist.length === 0) {
-            return res.status(404).json({ message: 'No books found for the given user.' });
+            return res.status(404).json({ message: 'No books found containing the given page.' });
         }
 
-     
-        res.status(200).json({ books: bookslist[0].books });
+        res.status(200).json({ books: bookslist });
 
-    
     } catch (error) {
         console.error('Error retrieving books:', error.message);
         res.status(500).json({ message: 'Error retrieving books.', error: error.message });
     }
 });
-
-
 
 
 
