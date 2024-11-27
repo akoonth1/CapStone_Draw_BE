@@ -141,7 +141,7 @@ book_router.get('/booklist/:id', async (req, res) => {
 
 
 // User's books
-book_router.get('/book/by/:id', /* auth, */ async (req, res) => { // Uncomment 'auth' if needed
+book_router.get('/book/by/:id', /* auth, */ async (req, res) => { // Update for auth usage 
     try {
         const { id } = req.params;
 

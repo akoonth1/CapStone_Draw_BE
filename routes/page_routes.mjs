@@ -11,11 +11,7 @@ dotenv.config();
 
 const page_router = express.Router();
 
-// Connect to the database
-// connectToDatabase();
 
-
-// Configure multer for file uploads (memory storage)
 const storage = multer.memoryStorage();
 const upload = multer({
   storage: storage,
@@ -31,9 +27,7 @@ page_router.post('/blob/', upload.single('file'), async (req, res) => {
         return res.status(400).json({ error: 'No file uploaded.' });
       }
 
-      // console.log('Received file:', req.file);
-      // console.log('Received file ID :', req.body.userId);
-      // console.log(req)
+
 
       // Verify that req.file.buffer is a Buffer
       if (!Buffer.isBuffer(req.file.buffer)) {

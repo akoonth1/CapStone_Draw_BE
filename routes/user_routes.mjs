@@ -17,20 +17,6 @@ dotenv.config();
 
 const user_router = express.Router();
 
-// Connect to the database
-// connectToDatabase();
-
-//Create a user
-// user_router.post('/user', async (req, res) => {
-//     try {
-//         const { name, email, password } = req.body;
-//         const user =  new User({ name, email, password });
-//         await user.save();
-//         res.status(201).json({ message: 'User uploaded successsfully.' })
-//     } catch (error) {
-//         res.status(500).json({ message: 'Internal server error.' })
-//     }
-// });
 
 user_router.post('/user', 
 [   check('name', 'Name is required').not().isEmpty(),
@@ -91,29 +77,11 @@ user_router.post('/user',
 
 
 
-//Get all user information
-// user_router.get('/user/:id', (req, res) => {
-//     try {
-//         const { id } = req.params;
-//         const user = User.findById(id);
-//         res.json(user);
-//     } catch (error) {
-//         res.status(500).send('Error retrieving user: ' + error.message);
-//     }
-// });
-
-
-
 user_router.get('/user/:id', async (req, res) => {
     try {
         const { id } = req.params;
 
-        // // Validate the ID format (optional but recommended)
-        // if (!id.match(/^[0-9a-fA-F]{24}$/)) {
-        //     return res.status(400).json({ message: 'Invalid user ID format.' });
-        // }
-
-        // Find the user by ID
+  user by ID
         const user = await User.findById(id).select('-password'); // Exclude password
 
         if (!user) {

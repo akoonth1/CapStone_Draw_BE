@@ -9,7 +9,7 @@ const userSchema = new mongoose.Schema({
     userType: { type: String, required: false},
     BookArray: { type: Array, required: false },
     Pages: { type: Array, required: false },  // array of page numbers
-    // categories: { type: String, required: false },
+    // Account_Type: { type: String, required: false },
 
   });
 
