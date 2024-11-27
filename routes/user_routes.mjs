@@ -81,7 +81,7 @@ user_router.get('/user/:id', async (req, res) => {
     try {
         const { id } = req.params;
 
-  user by ID
+//   user by ID
         const user = await User.findById(id).select('-password'); // Exclude password
 
         if (!user) {
