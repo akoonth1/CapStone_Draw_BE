@@ -24,7 +24,7 @@ book_router.get('/test', (req, res) => {
 book_router.post('/book', async (req, res) => {
     try {
         const { title, BookID, PagesArray, TextArray, PositionArray, createdBy } = req.body;
-        const book = new Book({ title, BookID, PagesArray, TextArray, PositionArray, createdBy });
+        const book = new Book({ title, BookID, PagesArray, TextArray, PositionArray, createdBy, Public: true });
         
     await book.save();
         res.status(201).json({ message: 'Book uploaded successsfully.' })

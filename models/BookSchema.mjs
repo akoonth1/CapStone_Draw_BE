@@ -8,6 +8,8 @@ const bookSchema = new mongoose.Schema({
     TextArray: { type: Array, required: false },
     PositionArray: { type: Array, required: false },
     createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: false },
+    Public: { type: Boolean, required: true },
+    Collection: { type: String, required: false },
 });
 
 // Unique index on title
